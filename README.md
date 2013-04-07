@@ -9,10 +9,15 @@ Lesser General Public License for more details.
 
 Setup instructions:
   Workrs with ASP.NET
+  
   Put content to Mapguide Web Extension Folder ($\mapguide\Web\www\)
+  
   Copy Mapguide .NET DLL-s (from $\mapguide\Web\www\mapviewernet\bin\) to $\KaliopaMobileViewer\bin\
+  
   In IIS Create virtual directory and Convert it to Application
+  
   Use it like mapviewerajax (call it with WEBLAYOUT Query String parameter)
+  
   
 Functions:
   Optimized for Mobile devices and works also in classic browsers
