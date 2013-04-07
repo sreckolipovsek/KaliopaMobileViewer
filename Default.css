@@ -1,0 +1,258 @@
+/*Default.css*/
+html, body
+{
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+@media only screen and (max-width: 600px)
+{
+    html, body
+    {
+        height: 100%;
+    }
+}
+#map
+{
+    width: 100%;
+    height: 100px;
+}
+#title, #tags, #shortdesc
+{
+    display: none;
+}
+
+.smallFont
+{
+    font-size: x-small;
+}
+
+.olControlAttribution
+{
+    position: absolute;
+    font-size: 10px;
+    bottom: 0 !important;
+    right: 0 !important;
+    background: rgba(0,0,0,0.1);
+    font-family: Arial;
+    padding: 2px 4px;
+    border-radius: 5px 0 0 0;
+}
+
+div.olControlZoomPanel
+{
+    top: 50px;
+}
+
+.olControlNavToolbar div, .myolControlEditingToolbar div
+{
+    margin: 5px 5px 5px 5px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+}
+/* positions */
+.myolControlEditingToolbar
+{
+    right: 0;
+    top: 0;
+}
+.olControlNavToolbar
+{
+    top: 295px;
+    left: 9px;
+}
+/* layouts */
+.myolControlEditingToolbar div
+{
+    float: left;
+}
+/* individual controls */
+.olControlNavToolbar .myolControlNavigationItemInactive, .myolControlEditingToolbar .myolControlNavigationItemInactive
+{
+    background-image: url("images/kpan.png");
+    background-repeat: no-repeat;
+    background-color: silver;
+    border: 2px solid #D71920;
+    border-radius: 5px 5px 5px 5px;
+}
+.olControlNavToolbar .myolControlNavigationItemActive, .myolControlEditingToolbar .myolControlNavigationItemActive
+{
+    background-image: url("images/kpan.png");
+    background-repeat: no-repeat;
+    background-color: white;
+    border: 2px solid #D71920;
+    border-radius: 5px 5px 5px 5px;
+}
+.myolControlEditingToolbar .myolControlDrawFeaturePointItemInactive
+{
+    background-image: url("images/pikaselect.png");
+    background-repeat: no-repeat;
+    background-color: silver;
+    border: 2px solid #D71920;
+    border-radius: 5px 5px 5px 5px;
+}
+.myolControlEditingToolbar .myolControlDrawFeaturePointItemActive
+{
+    background-image: url("images/pikaselect.png");
+    background-repeat: no-repeat;
+    background-color: white;
+    border: 2px solid #D71920;
+    border-radius: 5px 5px 5px 5px;
+}
+.myolControlEditingToolbar .myolControlDrawFeaturePolygonItemInactive
+{
+    background-image: url(images/poligonselect.png);
+    background-repeat: no-repeat;
+    background-color: silver;
+    border: 2px solid #D71920;
+    border-radius: 5px 5px 5px 5px;
+}
+.myolControlEditingToolbar .myolControlDrawFeaturePolygonItemActive
+{
+    background-image: url(images/poligonselect.png);
+    background-repeat: no-repeat;
+    background-color: white;
+    border: 2px solid #D71920;
+    border-radius: 5px 5px 5px 5px;
+}
+
+.myolControlEditingToolbar .myolControlDrawFeatureLineItemInactive
+{
+    background-image: url(images/Linijaselect.png);
+    background-repeat: no-repeat;
+    background-color: silver;
+    border: 2px solid #D71920;
+    border-radius: 5px 5px 5px 5px;
+}
+.myolControlEditingToolbar .myolControlDrawFeatureLineItemActive
+{
+    background-image: url(images/Linijaselect.png);
+    background-repeat: no-repeat;
+    background-color: white;
+    border: 2px solid #D71920;
+    border-radius: 5px 5px 5px 5px;
+}
+
+.myolControlEditingToolbar .myolControlMeasureLineItemInactive
+{
+    background-image: url(images/merirazdaljo.png);
+    background-repeat: no-repeat;
+    background-color: silver;
+    border: 2px solid #D71920;
+    border-radius: 5px 5px 5px 5px;
+}
+.myolControlEditingToolbar .myolControlMeasureLineItemActive
+{
+    background-image: url(images/merirazdaljo.png);
+    background-repeat: no-repeat;
+    background-color: white;
+    border: 2px solid #D71920;
+    border-radius: 5px 5px 5px 5px;
+}
+.myolControlEditingToolbar .myolControlMeasurePolygonItemInactive
+{
+    background-image: url(images/meripovrsno.png);
+    background-repeat: no-repeat;
+    background-color: silver;
+    border: 2px solid #D71920;
+    border-radius: 5px 5px 5px 5px;
+}
+.myolControlEditingToolbar .myolControlMeasurePolygonItemActive
+{
+    background-image: url(images/meripovrsno.png);
+    background-repeat: no-repeat;
+    background-color: white;
+    border: 2px solid #D71920;
+    border-radius: 5px 5px 5px 5px;
+}
+
+.olControlLayerSwitcher {
+    top: 45px;
+}
+
+/* avoid pink tiles */
+.olImageLoadError
+{
+    background-color: transparent !important;
+}
+#controlToggle li
+{
+    list-style: none;
+}
+.copyright-text
+{
+    float: right;
+    font-size: 10px;
+    padding-right: 2px;
+    color: #687E8C;
+}
+.login-text
+{
+    font-size: 12px;
+    padding-right: 2px;
+    color: #687E8C;
+}
+.table-text
+{
+    font-family: Arial;
+    font-size: 10px;
+    text-align: center;
+    vertical-align: middle;
+    height: 15px;
+    width: 70px; /*color:#91A2AF;*/
+    color: #687E8C;
+}
+.crta
+{
+    background-image: url(images/px.jpg);
+    background-repeat: repeat-x;
+    height: 1px;
+}
+
+#merilo
+{
+    width: 200px;
+    height: 30px;
+    padding: 2px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(196, 209, 219) rgb(158, 183, 205) rgb(158, 183, 205) rgb(196, 209, 219);
+    -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.10), 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+    -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.10), 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+    text-shadow: 0 1px 1px #fff;
+    font-family: Arial;
+    font-size: 12px;
+    color: #687E8C;
+}
+a img
+{
+    border: 0px;
+}
+
+.olControlLayerSwitcher .layersDiv
+{
+    background-color: #D71920;
+}
+
+div.olControlZoomPanel div {
+    background-image: url(images/mobile-zoombar.png);
+}
+
+.ui-tabs .ui-tabs-nav li a  
+{ 
+    padding: .3em .7em; 
+}
+
+#mapLoading
+{
+    display: none; 
+    border: 1px black solid;
+    background-color: White;
+    filter:alpha(opacity=80);   /* Internet Explorer       */
+    -moz-opacity:0.8;           /* Mozilla 1.6 and below   */
+    opacity: 0.8;               /* newer Mozilla and CSS-3 */
+}
+
+/*Default.css*/
