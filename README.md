@@ -15,16 +15,16 @@ Setup instructions:
   - Use it like mapviewerajax (call it with WEBLAYOUT Query String parameter)  
   
 Functions:
-  -Optimized for Mobile devices and works also in classic browsers
-  -Functions:
-    -Select on map by point, line, polygon
-    -Measure
-    -Intersct trought point
-    -Mobile Layer Tree
-    -Legend Image
-    -Show report of selected objects
-    -Go to Coordinate
-    -...
+  - Optimized for Mobile devices and works also in classic browsers
+  - Functions:
+    - Select on map by point, line, polygon
+    - Measure
+    - Intersct trought point
+    - Mobile Layer Tree
+    - Legend Image
+    - Show report of selected objects
+    - Go to Coordinate
+    - ...
 
 More info:
   http://gis.iobcina.si/gisapp/KaliopaMobileviewer
