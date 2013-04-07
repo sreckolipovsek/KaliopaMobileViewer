@@ -6,6 +6,9 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 Lesser General Public License for more details.
 
+Used libraries:
+  - jQuery and jQuery UI
+  - OpenLayers 2.12
 
 Setup instructions:
   - Workrs with ASP.NET  
