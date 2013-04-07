@@ -31,5 +31,8 @@ More info:
 YouToube video:
   http://www.youtube.com/watch?v=8LvKkv-kq0U
 
-Full version at:
+Demo site:
+  http://gis.iobcina.si/gisapp/m/Default.aspx?a=sheboygan
+
+Full version:
   http://gis.iobcina.si/gisapp/m/Default.aspx?a=bled&locale=EN
