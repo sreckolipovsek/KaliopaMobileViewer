@@ -34,10 +34,10 @@ Functions:
   - Functions:
     - Select on map by point, line, polygon
     - Measure
-    - Intersct trought point
+    - Intersect trought point
     - Mobile Layer Tree
     - Legend Image
-    - Show report of selected objects
+    - Show report (attributes) of selected objects
     - Go to Coordinate
     - ...
 
@@ -50,5 +50,5 @@ YouToube video:
 Demo site:
   http://gis.iobcina.si/gisapp/m/Default.aspx?a=sheboygan
 
-Full version:
+Full version (with base layers and other stuff):
   http://gis.iobcina.si/gisapp/m/Default.aspx?a=bled&locale=EN
