@@ -17,8 +17,9 @@
 	//
 	// jQuery Mapguide Layer Tree ASP.NET Connector
 	//
+	// This part of code is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
 	//
-	// Copyright Kaliopa d.o.o., Ljubljana, Slovenia, Srečko Lipovšek
+	// Wrriten by Kaliopa d.o.o., Ljubljana, Slovenia, Srečko Lipovšek
 	// srecko.lipovsek@kaliopa.si
 	// December 2012
 	// 

@@ -1,9 +1,9 @@
 ﻿<%@ WebHandler Language="C#" Class="PrintLegend" Debug="true" %>
 
-// Copyright Kaliopa d.o.o., Ljubljana, Slovenia, Srečko Lipovšek
+// This part of code is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+// Written by Kaliopa d.o.o., Ljubljana, Slovenia, Srečko Lipovšek
 // srecko.lipovsek@kaliopa.si
 // December 2012
-// 
 
 using System;
 using System.Collections.Generic;

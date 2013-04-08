@@ -18,7 +18,8 @@ using System.Text;
 using System.Linq;
 using System.Collections.Specialized;
 
-// Copyright Kaliopa d.o.o., Ljubljana, Slovenia, Srečko Lipovšek
+// This part of code is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+// Wrriten by Kaliopa d.o.o., Ljubljana, Slovenia, Srečko Lipovšek
 // srecko.lipovsek@kaliopa.si
 // December 2012 
 
