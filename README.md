@@ -8,6 +8,7 @@ Lesser General Public License for more details.
 
 Used libraries:
   - jQuery and jQuery UI
+  - jQuery File Tree Plugin
   - OpenLayers 2.12
 
 Setup instructions:
