@@ -42,6 +42,8 @@ Functions:
     - Go to Coordinate
 	- Permalink
 	- Modified Geolocation
+	- Keyboard navigation
+	- ESC key for clear selection, measure, ..., cancel comand ... 
     - ...
 
 More info:
