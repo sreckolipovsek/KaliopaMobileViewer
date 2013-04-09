@@ -423,7 +423,7 @@ function mapInit() {
         mapOptions =
 			    {
 			        controls: [
-                            new OpenLayers.Control.LayerSwitcher({ roundedCornerColor: "#D71920" }),
+                            //new OpenLayers.Control.LayerSwitcher({ roundedCornerColor: "#D71920" }),
                             new OpenLayers.Control.Scale(),
                             new OpenLayers.Control.TouchNavigation({
                                 dragPanOptions: {
@@ -452,7 +452,7 @@ function mapInit() {
         mapOptions =
 			    {
 			        controls: [
-                            new OpenLayers.Control.LayerSwitcher({ roundedCornerColor: "#D71920" }),
+                            //new OpenLayers.Control.LayerSwitcher({ roundedCornerColor: "#D71920" }),
                             new OpenLayers.Control.Scale(),
                             new OpenLayers.Control.Navigation({
                                 dragPanOptions: {
