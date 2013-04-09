@@ -24,7 +24,7 @@ using System.Collections.Specialized;
 // December 2012 
 
 public partial class m_OpenLayers : System.Web.UI.Page
-{       
+{
     [System.Web.Services.WebMethod()]
     [System.Web.Script.Services.ScriptMethod()]
     public static string TransformWgs2GK(double lat, double lon, double accuracy, string ss, string mpN) //Transform WGS84 to Map koordinate system
@@ -60,7 +60,7 @@ public partial class m_OpenLayers : System.Web.UI.Page
 
         //Create coordinate system factory
         MgCoordinateSystemFactory fact = new MgCoordinateSystemFactory();
-        string  wktFrom = map.GetMapSRS();
+        string wktFrom = map.GetMapSRS();
         string wktTo = "GEOGCS[\"LL84\",DATUM[\"WGS84\",SPHEROID[\"WGS84\",6378137.000,298.25722293]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.01745329251994]]";
 
         MgCoordinateSystem coordinateSystemSource = fact.Create(wktFrom);
@@ -77,27 +77,34 @@ public partial class m_OpenLayers : System.Web.UI.Page
 
     [System.Web.Services.WebMethod()]
     [System.Web.Script.Services.ScriptMethod()]
-    public static string GetVisSelLayers(string ss, string mpN){
+    public static string GetVisSelLayers(string ss, string mpN)
+    {
         MgMap map = new MgMap();
         MgResourceService resourceSrvc = GetMgResurceService(ss);
         map.Open(resourceSrvc, mpN);
         StringBuilder sb = new StringBuilder();
-        foreach (MgLayerBase item in map.GetLayers())
+        sb.Append("({");
+        sb.Append("'layers': [");
+        foreach (var item in map.GetLayers())
         {
             if (item.IsVisible() && item.Selectable)
             {
-                sb.Append(item.Name + ",");
+                sb.Append("{'name':");
+                sb.Append("'" + item.Name + "', ");
+                sb.Append("'legend':");
+                sb.Append("'" + item.LegendLabel + "'");
+                sb.Append("},");
             }
         }
-        return sb.ToString().Substring(0, sb.ToString().Length - 1);
+        return sb.ToString().Substring(0, sb.ToString().Length - 1) + "]})";
     }
-    
+
     private static MgResourceService GetMgResurceService(string sessionId)
     {
         // Initialize web tier with the site configuration file.  The config
-		// file should be in the same directory as this script.
-		// MapGuideApi.MgInitializeWebTier(Request.ServerVariables["APPL_PHYSICAL_PATH"] + "../webconfig.ini");
-	
+        // file should be in the same directory as this script.
+        // MapGuideApi.MgInitializeWebTier(Request.ServerVariables["APPL_PHYSICAL_PATH"] + "../webconfig.ini");
+
         MgUserInformation userInfo = new MgUserInformation(sessionId);
         MgSiteConnection site = new MgSiteConnection();
         site.Open(userInfo);
@@ -108,12 +115,12 @@ public partial class m_OpenLayers : System.Web.UI.Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
-        
+
     }
 
     protected void Page_PreRender(object sender, EventArgs e)
     {
-        
+
     }
-    
+
 }

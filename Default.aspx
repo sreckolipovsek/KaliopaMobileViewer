@@ -21,7 +21,6 @@
 	// srecko.lipovsek@kaliopa.si
 	// December 2012
 	
-	
 	String webLayoutDefinition = "";
 	String sessionId = "";
 	String orgSessionId = "";
@@ -382,7 +381,7 @@ try
 <head>
     <title>Kaliopa Mapguide Mobile Viewer</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=100; initial-scale=1.0; maximum-scale=1.0; user-scalable=1;" />
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=1;" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 	
@@ -418,7 +417,7 @@ try
 	    </ajaxToolkit:ToolkitScriptManager>
     </form>
     <div id="outer" style="display: none;">
-        <div id="tabs">
+        <div id="tabs" style="min-width:305px">
             <ul id="tabsUL">
                 <li><a href="#tabs-1">
                     <img src="images/home-selected.png" alt="" /></a></li>
@@ -470,6 +469,10 @@ try
                     <tr style="width: 100%; height: 100%">
                         <td style="width: 100%; height: 100%">
                             <div id="map">
+								<div id="customZoom">
+									<a href="#customZoomIn" id="customZoomIn"></a>
+									<a href="#customZoomOut" id="customZoomOut"></a>
+								</div>
                             </div>
                         </td>
                     </tr>
@@ -656,6 +659,15 @@ try
             </div>
             <div id="infoHolder" style="z-index: 2100; width: 100%; height: 100%">
             </div>
+			
+			<div id="selectlayers-form" title="Select Layers">
+			  <fieldset>
+				<div><input type="checkbox" id="checkall" checked="checked" class="checkall" />
+                <label for="checkall">Check/Uncheck all</label></div>
+				<hr />
+				<div id="sellyrsHolder"></div>
+			  </fieldset>
+			</div>	
             <div id="goToCoordinateHolderDialog" style="z-index: 2100; width: 100%; height: 100%">
                 <div id="goToCoordinateHolder" style="z-index: 2100; width: 100%; height: 100%">
                     <ul>
@@ -735,6 +747,7 @@ try
         </form>        
     </div>
     <script type="text/javascript">
+    //<![CDATA[
         //public properties
 		var DPI = 96;
 		var selectionColor = 'FF5300FF';
@@ -769,7 +782,7 @@ try
 		//path to mapguide.fcgi
         var webAgent = "<%=GetRootVirtualFolder(Request)%>/mapagent/mapagent.fcgi?";
         
-		var initMapOnLoad = false; //shoud auto open second tab and load map ... get it from database setting ? ...
+		var initMapOnLoad = true; //shoud auto open second tab and load map ... get it from database setting ? ...
 
         //javascript localization messages
 		//should set from localization ...
@@ -787,6 +800,15 @@ try
         var l_legenda = "Layer legend";
         var l_goToCoordinate = "Go to coordinate";
         var l_IzpisTitle = "PRINTOUTS and ANALYSIS";
+        var l_GPSTitle = "Locate me";
+		var l_GPSError = "Your device does not support geolocation!";
+		var l_GPSPerrmissionDenied = "Acces to geolocation was blocked by user.";
+		var l_GPSNotAvailable = "Could not get your geolocation. Check if your device support geolocation or you have permission for it.";
+		var l_GPSTimeout = "Timeout.";
+		var l_GPSUnknown = "Unknown error.";
+		var l_SelectionError = "Sorry, unexpected error ocured. Please try again!";
+		var l_LocationOutside = "Your location is outside of current map extent!";
+        var l_DrawPoint = "Draw POINT on screen.";
 
         var wmsLayArr1;
         var wmsLayArr2;
@@ -809,6 +831,7 @@ try
 			//If you are going to use GOOGLE or any other base map you shoud make your own OpenLayers.js build ...
 			//Read Readme_kaliopa.txt in OpenLayers-2.12 folder ...
         }
+        //]]>
     </script>
 </body>
 </html>

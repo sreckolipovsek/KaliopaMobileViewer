@@ -2,12 +2,13 @@
 // Wrriten by Kaliopa d.o.o., Ljubljana, Slovenia, Srečko Lipovšek
 // srecko.lipovsek@kaliopa.si
 // December 2012 
-	
+
 //global variables
 var selection = new Selection();
-var firstGeolocation = true;
 var map;
-var geolocate;
+var GPSWatch = null;
+var GPSWatchTrack = false;
+var GPStm;
 var mgLayer;
 var mgLayerSel;
 var vector;
@@ -19,15 +20,221 @@ var fgfText;
 var maxR;
 var selectInfo = false;
 var shouldClearSearch = true;
+var skipEvent = false;
 var popup;
 var dialogOpen = false;
 var stopResize = false;
+var loadingShown = false;
+
+//Test
+//GPSSet(false, true);
+//GPSSet(true, true);
+//GPSSet(false, false);
+function GPSLocateMe() {
+    vector.removeAllFeatures();
+    ShowLoading();
+    GPSSet(false, true);
+}
+
+function GPSSet(watch, on) {
+    if (navigator.geolocation == null || navigator.geolocation.watchPosition == null) {
+        alert(l_GPSError);
+        return;
+    }
+
+    GPSWatchTrack = watch;
+
+    if (on) {
+        if (GPSWatch == null) {
+            GPStm = new Date().getTime();
+            GPSWatch = navigator.geolocation.watchPosition(GPSOk_highAccuracy, GPSError_highAccuracy, { maximumAge: 3000, timeout: 10000, enableHighAccuracy: true });
+        }
+    }
+    else {
+        GPSClearWatch();
+    }
+}
+
+function GPSOk_highAccuracy(e) {
+    if (!GPSWatchTrack) { //če je zahtevek po trenutni lokaciji ...	
+        GPSClearWatch();
+    }
+    vector.removeAllFeatures();
+    PageMethods.TransformWgs2GK(e.coords.latitude, e.coords.longitude, e.coords.accuracy, sessionId, mapName, OnSuccessTransformWgs2GK, OnFailTransformWgs2GK);
+    HideLoading();
+}
+
+function GPSOk_lowAccuracy(e) {
+    if (!GPSWatchTrack) {
+        GPSClearWatch();
+    }
+    vector.removeAllFeatures();
+    PageMethods.TransformWgs2GK(e.coords.latitude, e.coords.longitude, e.coords.accuracy, sessionId, mapName, OnSuccessTransformWgs2GK, OnFailTransformWgs2GK);
+    HideLoading();
+}
+
+function GPSError_highAccuracy(err) {
+    switch (err.code) {
+        case err.PERMISSION_DENIED:
+            HideLoading();
+            GPSClearWatch();
+            alert(l_GPSPerrmissionDenied);
+            break;
+        case err.POSITION_UNAVAILABLE:
+            HideLoading();
+            GPSClearWatch();
+            alert(l_GPSNotAvailable);
+            break;
+        case err.TIMEOUT:
+            GPSClearWatch();
+            GPSWatch = navigator.geolocation.watchPosition(
+				   GPSOk_lowAccuracy,
+				   GPSError_lowAccuracy,
+				   { maximumAge: 3000, timeout: 10000, enableHighAccuracy: false }); //poskusim še low acuracy ... lokacija na podlagi IP naslova
+            break;
+        case err.UNKNOWN_ERROR:
+            HideLoading();
+            GPSClearWatch();
+            alert(l_GPSUnknown);
+            break;
+    }
+}
+
+function GPSError_lowAccuracy(err) {
+    HideLoading();
+    GPSClearWatch();
+    switch (err.code) {
+        case err.PERMISSION_DENIED:
+            alert(l_GPSPerrmissionDenied);
+            break;
+        case err.POSITION_UNAVAILABLE:
+            alert(l_GPSNotAvailable);
+            break;
+        case err.TIMEOUT:
+            alert(l_GPSTimeout);
+            break;
+        case err.UNKNOWN_ERROR:
+            alert(l_GPSUnknown);
+            break;
+    }
+}
+
+function GPSClearWatch() {
+    if (GPSWatch != null) {
+        navigator.geolocation.clearWatch(GPSWatch);
+        GPSWatch = null;
+    }
+}
 
 var style = {
     fillColor: '#000',
     fillOpacity: 0.1,
     strokeWidth: 0
 };
+
+
+var styles = new OpenLayers.StyleMap({
+    "default": new OpenLayers.Style(null, {
+        rules: [
+			new OpenLayers.Rule({
+			    symbolizer: {
+			        "Point": {
+			            pointRadius: 7,
+			            graphicName: "square",
+			            fillColor: "white",
+			            fillOpacity: 0.25,
+			            strokeWidth: 2,
+			            strokeOpacity: 1,
+			            strokeColor: "#3333aa"
+			        },
+			        "Line": {
+			            strokeWidth: 3,
+			            strokeOpacity: 1,
+			            strokeColor: "#6666aa"
+			        },
+			        "Polygon": {
+			            strokeWidth: 2,
+			            strokeOpacity: 1,
+			            fillColor: "#9999aa",
+			            strokeColor: "#6666aa"
+			        }
+			    }
+			})
+		]
+    }),
+    "select": new OpenLayers.Style(null, {
+        rules: [
+			new OpenLayers.Rule({
+			    symbolizer: {
+			        "Point": {
+			            pointRadius: 7,
+			            graphicName: "square",
+			            fillColor: "white",
+			            fillOpacity: 0.25,
+			            strokeWidth: 3,
+			            strokeOpacity: 1,
+			            strokeColor: "#0000ff"
+			        },
+			        "Line": {
+			            strokeWidth: 3,
+			            strokeOpacity: 1,
+			            strokeColor: "#0000ff"
+			        },
+			        "Polygon": {
+			            strokeWidth: 3,
+			            strokeOpacity: 1,
+			            fillColor: "#0000ff",
+			            strokeColor: "#0000ff"
+			        }
+			    }
+			})
+		]
+    }),
+    "temporary": new OpenLayers.Style(null, {
+        rules: [
+			new OpenLayers.Rule({
+			    symbolizer: {
+			        "Point": {
+			            graphicName: "square",
+			            pointRadius: 7,
+			            fillColor: "white",
+			            fillOpacity: 0.25,
+			            strokeWidth: 3,
+			            strokeColor: "#0000ff"
+			        },
+			        "Line": {
+			            strokeWidth: 3,
+			            strokeOpacity: 1,
+			            strokeColor: "#0000ff"
+			        },
+			        "Polygon": {
+			            strokeWidth: 2,
+			            strokeOpacity: 1,
+			            strokeColor: "#0000ff",
+			            fillColor: "#0000ff"
+			        }
+			    }
+			})
+		]
+    })
+});
+
+function GotoView(x, y, s, a, b) {
+    var cntL = new OpenLayers.LonLat(x, y);
+    map.setCenter(cntL, 1);
+    map.zoomToScale(s, true);
+}
+
+function ActivateControl(id) {
+    //aktiviram izbiro točke
+    toolbar.controls[id].activate();
+    //ostale deaktiviram
+    for (var i = 0; i < toolbar.controls.length; i++) {
+        if (id != i) {
+            toolbar.controls[i].deactivate();
+        }
+    }
+}
 
 (function ($) {
     $.fn.extend({
@@ -60,23 +267,23 @@ $(document).ready(function () {
 
     $("#tabs").tabs(
 		{
-			select: function (e, ui) {
-				var thistab = ui.index;
-				if (thistab == 1 && !mapInitComplete) {
-					// Get hidden tabs content 
-					var $cache = $(".ui-tabs-hide");
+		    select: function (e, ui) {
+		        var thistab = ui.index;
+		        if (thistab == 1 && !mapInitComplete) {
+		            // Get hidden tabs content 
+		            var $cache = $(".ui-tabs-hide");
 
-					// Make them visible 
-					$cache.removeClass("ui-tabs-hide");
+		            // Make them visible 
+		            $cache.removeClass("ui-tabs-hide");
 
-					mapInit();
-					mapInitComplete = true;
+		            mapInit();
+		            mapInitComplete = true;
 
-					// Re-hide the tabs content 
-					$cache.addClass("ui-tabs-hide");
+		            // Re-hide the tabs content 
+		            $cache.addClass("ui-tabs-hide");
 
-				}
-			}
+		        }
+		    }
 		}
 	);
     $("#tabs").css('height', '100%');
@@ -92,31 +299,26 @@ $(document).ready(function () {
         checkMapInit();
         $('#tabs').tabs('select', 1);
         vector.removeAllFeatures();
-        geolocate.deactivate();
-        geolocate.watch = false;
-        firstGeolocation = true;
-        geolocate.activate();
+        ShowLoading();
+        GPSSet(false, true);
     });
-	
-	//track my geolocation
     $('#track').click(function () {
         checkMapInit();
         $('#tabs').tabs('select', 1);
         vector.removeAllFeatures();
-        geolocate.deactivate();
-        if (!geolocate.watch) {
-            geolocate.watch = true;
-            firstGeolocation = true;
-            geolocate.activate();
+        //geolocate.deactivate();
+        if (GPSWatch == null) {
             $('#track')[0].src = "images/sledi.png";
+            ShowLoading();
+            GPSSet(true, true);
         }
         else {
-            geolocate.watch = false;
-            firstGeolocation = true;
-            geolocate.deactivate();
             $('#track')[0].src = "images/nesledi.png";
+            HideLoading();
+            GPSSet(false, false);
         }
     });
+    //$('#track').attr('checked', false);
 
     //esc button, enter button
     $(document).keyup(function (e) {
@@ -126,12 +328,7 @@ $(document).ready(function () {
                 control = toolbar.controls[i];
                 control.cancel();
             }
-            //activate navigation ...
-            toolbar.controls[0].activate();
-            //deactivate rest
-            for (var i = 1; i < toolbar.controls.length; i++) {
-                toolbar.controls[i].deactivate();
-            }
+            ActivateControl(0);
             selectInfo = false;
             //clear selection
             ClearSelection();
@@ -176,7 +373,11 @@ $(document).ready(function () {
         $("#inputField").val("");
         $("#clearBtn").hide("slow");
     });
-	
+
+    $('.checkall').click(function () {
+        $(this).parents('fieldset:eq(0)').find(':checkbox').attr('checked', this.checked);
+    });
+
 });
 
 function checkMapInit() {
@@ -204,7 +405,7 @@ function mapInit() {
     //different DPI value which will be passed to the server as a parameter.
     //Tiled and untiled layers must adjust the OL INCHES_PER_UNIT values
     //for any degree-based projections.
-	
+
     var metersPerUnit = 1;
     var inPerUnit = OpenLayers.INCHES_PER_UNIT.m * metersPerUnit;
     OpenLayers.INCHES_PER_UNIT["dd"] = inPerUnit;
@@ -216,7 +417,7 @@ function mapInit() {
 
     var mapOptions;
 
-	//global variable in default.aspx
+    //global variable in default.aspx
     if (isMobile) {
         //mobile options
         mapOptions =
@@ -229,7 +430,13 @@ function mapInit() {
                                     enableKinetic: true
                                 }
                             }),
-                           new OpenLayers.Control.ZoomPanel()//,
+			        //new OpenLayers.Control.Permalink({anchor: true}),
+							new OpenLayers.Control.Zoom({
+							    zoomInId: "customZoomIn",
+							    zoomOutId: "customZoomOut"
+							})
+
+			        //,
 			        //new OpenLayers.Control.OverviewMap()
 					     ],
 			        units: "m",
@@ -247,12 +454,20 @@ function mapInit() {
 			        controls: [
                             new OpenLayers.Control.LayerSwitcher({ roundedCornerColor: "#D71920" }),
                             new OpenLayers.Control.Scale(),
-                            new OpenLayers.Control.Navigation(),
-                            new OpenLayers.Control.ZoomPanel(),
-                            //new OpenLayers.Control.PanPanel(),
-                            new OpenLayers.Control.ZoomBox(),
+                            new OpenLayers.Control.Navigation({
+                                dragPanOptions: {
+                                    enableKinetic: true
+                                }
+                            }),
+			        //new OpenLayers.Control.Permalink({anchor: true}),
+                            new OpenLayers.Control.Zoom({
+                                zoomInId: "customZoomIn",
+                                zoomOutId: "customZoomOut"
+                            }),
+			        //new OpenLayers.Control.PanPanel(),
+			        // new OpenLayers.Control.ZoomBox(),
                             new OpenLayers.Control.KeyboardDefaults()//,
-                            //new OpenLayers.Control.OverviewMap()
+			        //new OpenLayers.Control.OverviewMap()
 					     ],
 			        units: "m",
 			        maxResolution: "auto",
@@ -265,26 +480,6 @@ function mapInit() {
 
     map = new OpenLayers.Map('map', mapOptions);
     map.updateSize();
-
-    geolocate = new OpenLayers.Control.Geolocate({
-        bind: false,
-        geolocationOptions: {
-            enableHighAccuracy: false,
-            maximumAge: 0,
-            timeout: 7000
-        }
-    });
-
-    map.addControl(geolocate);
-
-    geolocate.events.register("locationupdated", geolocate, function (e) {
-        vector.removeAllFeatures();
-        PageMethods.TransformWgs2GK(e.point.y, e.point.x, e.position.coords.accuracy, sessionId, mapName, OnChangeTransformWgs2GK);
-    });
-
-    geolocate.events.register("locationfailed", this, function () {
-		alert('Location detection failed');
-    });
 
     //wms rasters
     initWms();
@@ -342,16 +537,16 @@ function mapInit() {
 
     //mapguide map image
     mgLayer = new OpenLayers.Layer.MapGuide(appDesc, webAgent, params, options);
-	
-	//loading indicator
-	// mgLayer.events.register("loadstart", mgLayer, function () {
-	   // $("#mapLoading").center();
-	   // $("#mapLoading").slideToggle("slow");
-	// });
-	
-	// mgLayer.events.register("loadend", mgLayer, function () {
-	   // $("#mapLoading").slideToggle("slow");
-	// });
+
+    //loading indicator
+    // mgLayer.events.register("loadstart", mgLayer, function () {
+    // $("#mapLoading").center();
+    // $("#mapLoading").slideToggle("slow");
+    // });
+
+    // mgLayer.events.register("loadend", mgLayer, function () {
+    // $("#mapLoading").slideToggle("slow");
+    // });
 
     map.addLayer(mgLayer);
 
@@ -408,12 +603,7 @@ function mapInit() {
                 Submit(pageUrl, paramss, "infoframe");
 
                 vectorSel.removeAllFeatures();
-                //activate navigation
-                toolbar.controls[0].activate();
-                //deactivate rest ones
-                for (var i = 1; i < toolbar.controls.length; i++) {
-                    toolbar.controls[i].deactivate();
-                }
+                ActivateControl(0);
                 selectInfo = false;
             }
         }
@@ -471,7 +661,7 @@ function mapInit() {
                  new OpenLayers.Control.DrawFeature(vectorSel, OpenLayers.Handler.Polygon, {
                      displayClass: 'myolControlDrawFeaturePolygon'
                  }),
-                 //tale mora biti vsaj na 4. mestu, ker jo koda naprej kliče po id-ju ...
+    //tale mora biti vsaj na 4. mestu, ker jo koda naprej kliče po id-ju ...
                  new OpenLayers.Control.Measure(
                     OpenLayers.Handler.Path, {
                         persist: true,
@@ -493,7 +683,17 @@ function mapInit() {
                 ]);
 
     map.addControl(toolbar);
-        
+
+    var toolbar2 = new OpenLayers.Control.Panel({
+        displayClass: 'myolControlEditingToolbar2'
+    });
+
+    var button2 = new OpenLayers.Control.Button({ displayClass: 'olControlButton2', trigger: MakeLegend, title: l_vsebineOnOff });
+    var button3 = new OpenLayers.Control.Button({ displayClass: 'olControlButton3', trigger: PrintLegend1, title: l_legenda });
+    var button4 = new OpenLayers.Control.Button({ displayClass: 'olControlButton4', trigger: GPSLocateMe, title: l_GPSTitle });
+
+    toolbar2.addControls([button2, button3, button4]);
+    map.addControl(toolbar2);
     toolbar.controls[0].activate();
 
     var control;
@@ -512,8 +712,11 @@ function mapInit() {
         "zoomend": handleMapZoomEnd
     });
 
-	map.setCenter(centerLonLat, 1);
-	map.zoomToExtent(extent);    
+    map.setCenter(centerLonLat, 1);
+    map.zoomToExtent(extent);
+
+
+    map.addControl(new OpenLayers.Control.Permalink({ anchor: true }));
     //map init
 }
 
@@ -647,6 +850,20 @@ function ChangeVisibility(nodeType, objectId) {
     return false;
 }
 
+function ShowLoading() {
+    if (!loadingShown) {
+        $("#mapLoading").center();
+        $("#mapLoading").slideToggle("slow");
+    }
+    loadingShown = true;
+}
+
+function HideLoading() {
+    if (loadingShown) {
+        $("#mapLoading").slideToggle("slow");
+    }
+    loadingShown = false;
+}
 //all visible layers
 function PrintLegend1() {
     checkMapInit();
@@ -688,7 +905,7 @@ var pulsate = function (feature) {
 };
 
 function OnChangeTransformWgs2GK(result) {
-	
+
     var spl = result.split(';');
 
     var circle = new OpenLayers.Feature.Vector(
@@ -731,7 +948,7 @@ function MakeWktPolygon(x1, y1, x2, y2) {
 function RequestPointSelection(x1, y1, x2, y2) {
     fgfText = MakeWktPolygon(x1, y1, x2, y2);
     maxR = 1;
-    SetSelection2();
+    SetSelection2(false);
 }
 
 function RequestPolygonSelection(geome) {
@@ -745,7 +962,7 @@ function RequestPolygonSelection(geome) {
     fgfText += geome.getVertices()[0].x + " " + geome.getVertices()[0].y + " ";
     fgfText += "))";
     maxR = 0;
-    SetSelection2();
+    SetSelection2(true);
 }
 
 function RequestLineSelection(geome) {
@@ -757,7 +974,7 @@ function RequestLineSelection(geome) {
     }
     fgfText += ")";
     maxR = 0;
-    SetSelection2();
+    SetSelection2(true);
 }
 
 function QueryFeatureInfo(geom, visl, maxfeatures) {
@@ -791,7 +1008,7 @@ function ProcessFeatureInfo(xmlIn, maxfeatures) {
 
         var classElt = layers[i].getElementsByTagName("Class")[0];
         var className = classElt.getAttribute("id");
-        
+
         var newLayer = new SelLayer(className);
         selection.layers.setItem(layerId, newLayer);
 
@@ -826,7 +1043,7 @@ function ProcessFeatureInfo(xmlIn, maxfeatures) {
     outHtml += '<tr><td class="smallFont" colspan="2">';
     outHtml += '<b><a style="font-size:8pt;" id="mgshow" href=\"javascript:MultiGridShow();\"><img style="border:0" src="images/mActionOpenTable.png"/>' + l_izpis + '</a></b><br/>';
     outHtml += '<b><a style="font-size:8pt;" id="mggosel" href=\"javascript:ZoomSelection();\"><img style="border:0" src="images/mActionZoomToSelected.png"/>' + l_pojdi + '</a></b>';
-    
+
     outHtml += '</td></tr>';
     outHtml += "</table>";
 
@@ -897,13 +1114,8 @@ function onFailTransformGK2WgsCoord(e) {
 function PointInfoCommand() {
     checkMapInit();
     $('#tabs').tabs('select', 1);
-    //aktiviram izbiro točke
-    toolbar.controls[1].activate();
-    //ostale deaktiviram
-    toolbar.controls[0].deactivate();
-    for (var i = 2; i < toolbar.controls.length; i++) {
-        toolbar.controls[i].deactivate();
-    } 
+    ActivateControl(1);
+    alert(l_DrawPoint);
     selectInfo = true;
 }
 
@@ -925,7 +1137,7 @@ function GoTo() {
     var x = stringToDouble(document.getElementById("winGotToX").value);
     var y = stringToDouble(document.getElementById("winGotToY").value);
 
-    ShowLocation(x, y);
+    ShowLocation(x, y, 200);
 }
 
 function IsNumeric(sText) {
@@ -962,26 +1174,48 @@ function GoToLatLon() {
         document.getElementById("winGotToLon").focus;
         return;
     }
-    
+
     var lat = stringToDouble(document.getElementById("winGotToLat").value);
     var lon = stringToDouble(document.getElementById("winGotToLon").value);
 
-    PageMethods.TransformWgs2GK(lat, lon, 0, sessionId, mapName, OnSuccessTransformWgs2GK, OnFailTransformWgs2GK);
+    PageMethods.TransformWgs2GK(lat, lon, 200, sessionId, mapName, OnSuccessTransformWgs2GK, OnFailTransformWgs2GK);
 }
 
 function OnSuccessTransformWgs2GK(result) {
     var spl = result.split(';');
-    var x = spl[0];
-    var y = spl[1];
-    ShowLocation(x, y);
+    var x = spl[0] * 1;
+    var y = spl[1] * 1;
+    var acc = spl[2] * 1;
+    ShowLocation(x, y, acc);
 }
 
-function ShowLocation(x, y) {
+function ShowLocation(x, y, accuracy) {
+
+    if (x < llX) {
+        alert(l_LocationOutside);
+        return;
+    }
+
+    if (x > urX) {
+        alert(l_LocationOutside);
+        return;
+    }
+
+    if (y < llY) {
+        alert(l_LocationOutside);
+        return;
+    }
+
+    if (y > urY) {
+        alert(l_LocationOutside);
+        return;
+    }
+
     vector.removeAllFeatures();
     var circle = new OpenLayers.Feature.Vector(
                 OpenLayers.Geometry.Polygon.createRegularPolygon(
                     new OpenLayers.Geometry.Point(x, y),
-                    100,
+                    accuracy / 2,
                     40,
                     0
                 ),
@@ -1002,7 +1236,43 @@ function ShowLocation(x, y) {
                 ),
                 circle
             ]);
-    map.zoomToExtent(vector.getDataExtent());
+    var mb = map.getExtent();
+    var vb = vector.getDataExtent();
+    var mw = mb.getWidth();
+    var vw = vb.getWidth();
+
+    var zm = false;
+    //če se bound lokacije ne seka z boundom trenutnega pogleda ...
+    if (!mb.intersectsBounds(vb)) {
+        if (vw < 30) {
+            vb = vb.scale(3);
+        }
+        map.zoomToExtent(vb);
+        zm = true;
+    }
+
+    if (!zm) {
+        //če je razmerje širine bounda lokacije z boundom pogleda večje kot 20, potem je zoom na lokacijo ...
+        if (mw / vw > 20) {
+            if (vw < 30) {
+                vb = vb.scale(3);
+            }
+            map.zoomToExtent(vb);
+            zm = true;
+        }
+    }
+
+    //če center lokacije leži izven trenutnega pogleda ...
+    if (!zm) {
+        if (!mb.containsLonLat(vb.getCenterLonLat())) {
+            if (vw < 30) {
+                vb = vb.scale(3);
+            }
+            map.zoomToExtent(vb);
+            zm = true;
+        }
+    }
+
     pulsate(circle);
 }
 
@@ -1141,12 +1411,67 @@ function SetSelection(selText, requery) {
         return reqHandler.responseXML;
 }
 
-function SetSelection2() {
-    PageMethods.GetVisSelLayers(sessionId, mapName, OnSetSelectionComplete);
+function SetSelection2(showDialog) {
+    PageMethods.GetVisSelLayers(sessionId, mapName, OnSetSelectionComplete, OnSetSelectionError, showDialog);
 }
 
-function OnSetSelectionComplete(result) {
-    QueryFeatureInfo(fgfText, result, maxR);
+function OnSetSelectionComplete(result, showDialog) {
+    var content = $('#sellyrsHolder')[0];
+    content.innerHTML = "";
+    var lyrs = eval(result);
+    var allLayers = new Array();
+    for (var i = 0; i < lyrs.layers.length; i++) {
+        var lyr = lyrs.layers[i];
+        content.innerHTML += '<input checked type="checkbox" id="' + lyr.name + '" name="' + lyr.name + '" value="' + lyr.name + '"' + '/>';
+        content.innerHTML += '<label for="' + lyr.name + '">' + lyr.legend + '</label><br />';
+        allLayers.push(lyr.name);
+    }
+
+    if (showDialog && lyrs.layers.length > 1) {
+        $("#checkall").attr('checked', true);
+
+        $("#selectlayers-form").dialog({
+            autoResize: true,
+            modal: true,
+            buttons: {
+                "OK": function () {
+                    $(this).dialog("close");
+
+                    var selected = new Array();
+                    $('#sellyrsHolder input:checked').each(function () {
+                        var nm = $(this).attr('name');
+                        if (nm != "") {
+                            selected.push(nm);
+                        }
+                    });
+
+                    if (selected.length > 0) {
+                        QueryFeatureInfo(fgfText, selected.join(), maxR);
+                    }
+                    else {
+                        vectorSel.removeAllFeatures();
+                        vectorSel.redraw(true);
+                    }
+                },
+                Cancel: function () {
+                    $(this).dialog("close");
+                    vectorSel.removeAllFeatures();
+                    vectorSel.redraw(true);
+                }
+            },
+            close: function () {
+            }
+        });
+    }
+    else {
+        QueryFeatureInfo(fgfText, allLayers.join(), maxR);
+    }
+}
+
+function OnSetSelectionError(result) {
+    vectorSel.removeAllFeatures();
+    vectorSel.redraw(true);
+    alert(l_SelectionError);
 }
 
 function ZoomSelection() {
