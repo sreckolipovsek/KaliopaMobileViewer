@@ -27,18 +27,21 @@ Setup instructions:
   - Put content to Mapguide Web Extension Folder ($\mapguide\Web\www\)  
   - Copy Mapguide .NET DLL-s (from $\mapguide\Web\www\mapviewernet\bin\) to $\KaliopaMobileViewer\bin\  
   - In IIS Create virtual directory and Convert it to Application  
-  - Use it like mapviewerajax (call it with WEBLAYOUT Query String parameter)  
+  - Use it like mapviewerajax (call it with WEBLAYOUT Query String parameter)
   
 Functions:
   - Optimized for Mobile devices and works also in classic browsers
   - Functions:
     - Select on map by point, line, polygon
+	- Chose layer to selet if more than one is turned on while selecting by line or polygon
     - Measure
     - Intersect trought point
     - Mobile Layer Tree
     - Legend Image
-    - Show report (attributes) of selected objects
+    - Show report (attributes) of selected objects in table
     - Go to Coordinate
+	- Permalink
+	- Modified Geolocation
     - ...
 
 More info:
