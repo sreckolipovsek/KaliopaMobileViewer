@@ -23,7 +23,7 @@ Used libraries:
   - AjaxControlToolkit
 
 Setup instructions:
-  - Workrs with ASP.NET  
+  - Workrs with ASP.NET (use .NET or Manual setup option while installing MG to get MapViewerNet folder)
   - Put content to Mapguide Web Extension Folder ($\mapguide\Web\www\)  
   - Copy Mapguide .NET DLL-s (from $\mapguide\Web\www\mapviewernet\bin\) to $\KaliopaMobileViewer\bin\  
   - In IIS Create virtual directory and Convert it to Application  
