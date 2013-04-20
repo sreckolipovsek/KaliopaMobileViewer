@@ -58,9 +58,38 @@
         dir = Server.UrlDecode(Request.Form["dir"]).ToString().Replace("/", "");
         grps = map.GetLayerGroups().Where(t => t.Group != null && t.Group.GetObjectId() == dir).ToList();
     }
-	
+
+    List<MgLayerBase> lyrs = null;
+
+    if (string.IsNullOrEmpty(dir))
+    {
+        lyrs = map.GetLayers().Where(t => t.Group == null).ToList(); //root layers
+    }
+    else
+    {
+        lyrs = map.GetLayers().Where(t => t.Group.GetObjectId() == dir).ToList(); //layers inside groups ...
+    }
+    
+    Response.Write("<ul class=\"jqueryFileTree\" style=\"display: none;\">\n");
+    foreach (var fi in lyrs)
+    {
+        // legend image
+        // string url = "http://" + Request.ServerVariables["SERVER_NAME"] + "/mapguide/mapagent/mapagent.fcgi" + "?OPERATION=GETLEGENDIMAGE&SESSION=" + sessionId +
+        // "&VERSION=1.0.0&SCALE=" + map.ViewScale + "&LAYERDEFINITION=" + Server.UrlEncode(fi.GetLayerDefinition().ToString()) +
+        // "&THEMECATEGORY=" + (0) + "&TYPE=" + (-1) + "&CLIENTAGENT=" + "Ajax%20Viewer";
+
+        string checkedIcon = "images/lc_checked.png";
+        if (!fi.Visible)
+        {
+            checkedIcon = "images/lc_unchecked.png";
+        }
+
+        string oid = fi.GetObjectId();
+        Response.Write("\t<li><a href=\"#\" rel=\"" + oid + "\"><img id=\"Chk_" + oid + "\" onclick=\"ChangeVisibility(0,'" + oid + "');\" border=0 src=\"" + checkedIcon + "\" />" + /*"<img border=0 src=\"" + url + "\" />" +*/ fi.LegendLabel + "</a></li>\n");
+    }
+    
 	//System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(dir);
-	Response.Write("<ul class=\"jqueryFileTree\" style=\"display: none;\">\n");
+	
     foreach (var di_child in grps)
     {
         string checkedIcon = "images/lc_checked.png";
@@ -71,24 +100,6 @@
         string oid = di_child.GetObjectId();
         Response.Write("\t<li class=\"directory collapsed\"><a href=\"#\" rel=\"" + oid + "/\"><img id=\"Chk_" + oid + "\" onclick=\"ChangeVisibility(1,'" + oid + "');\" border=0 src=\"" + checkedIcon + "\" />" + di_child.LegendLabel + "</a></li>\n");
     }
-	
-    var lyrs = map.GetLayers().Where(t => t.Group.GetObjectId() == dir).ToList();
-	
-    foreach (var fi in lyrs)
-	{
-	   // legend image
-       // string url = "http://" + Request.ServerVariables["SERVER_NAME"] + "/mapguide/mapagent/mapagent.fcgi" + "?OPERATION=GETLEGENDIMAGE&SESSION=" + sessionId +
-       // "&VERSION=1.0.0&SCALE=" + map.ViewScale + "&LAYERDEFINITION=" + Server.UrlEncode(fi.GetLayerDefinition().ToString()) +
-       // "&THEMECATEGORY=" + (0) + "&TYPE=" + (-1) + "&CLIENTAGENT=" + "Ajax%20Viewer";
-
-        string checkedIcon = "images/lc_checked.png";
-        if (!fi.Visible)
-        {
-            checkedIcon = "images/lc_unchecked.png";
-        }
         
-        string oid = fi.GetObjectId();
-        Response.Write("\t<li><a href=\"#\" rel=\"" + oid + "\"><img id=\"Chk_" + oid + "\" onclick=\"ChangeVisibility(0,'" + oid + "');\" border=0 src=\"" + checkedIcon + "\" />" + /*"<img border=0 src=\"" + url + "\" />" +*/ fi.LegendLabel + "</a></li>\n");		
-	}
 	Response.Write("</ul>");
  %>
