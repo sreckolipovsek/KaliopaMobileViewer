@@ -495,7 +495,7 @@ function mapInit() {
         singleTile: true,
         units: 'm',
         transitionEffect: 'resize',
-        ratio: 1.0
+        ratio: 1.1
     };
 
     var optionsSel = {
@@ -506,7 +506,7 @@ function mapInit() {
         singleTile: true,
         units: 'm',
         transitionEffect: 'resize',
-        ratio: 1.0
+        ratio: 1.1
     };
 
     var params = {
