@@ -36,6 +36,8 @@
 	String cX = ""; 
 	String cY = ""; 
 	String CurrentDecimalSeparator = "";	
+	String metersPerUnit = "";
+	String unitsType;
 </script>
 
 <script runat="server">
@@ -305,6 +307,26 @@ try
 		MgEnvelope mapExtent = map.MapExtent;
 		String srs = map.GetMapSRS();
 
+		metersPerUnit = "1.0";		
+				
+		if(srs != null && srs.Length > 0)
+		{
+			MgCoordinateSystemFactory csFactory = new MgCoordinateSystemFactory();
+			MgCoordinateSystem cs = csFactory.Create(srs);
+			metersPerUnit = cs.ConvertCoordinateSystemUnitsToMeters(1.0).ToString().Replace(',', '.');
+			//must be openlayers styled: Possible values are 'degrees' (or 'dd'), 'm', 'ft', 'km', 'mi', 'inches'. 
+			unitsType = cs.GetUnits().ToLower();
+			if(unitsType.Contains("deg")) unitsType = "dd";
+			if(unitsType.Contains("inc")) unitsType = "inches";
+			if(unitsType.Contains("feet")) unitsType = "ft";
+			if(unitsType == "meter") unitsType = "m";
+		}
+		else
+		{
+			//must be openlayers styled: Possible values are 'degrees' (or 'dd'), 'm', 'ft', 'km', 'mi', 'inches'.  
+			unitsType = "m"; //MgLocalizer.GetString("DISTANCEMETERS", locale);
+		}
+		
 		MgCoordinate llExtent = mapExtent.GetLowerLeftCoordinate();
 		MgCoordinate urExtent = mapExtent.GetUpperRightCoordinate();
 
@@ -752,7 +774,9 @@ try
 		var DPI = 96;
 		var selectionColor = 'FF5300FF';
 		var clientAgent = '<%= GetClientAgent() %>';
-		var metersPerUnit = 111319.4908;  //value returned from mapguide ?!
+		var metersPerUnit = <%= metersPerUnit %>;  //value returned from mapguide !
+		//must be openlayers styled: Possible values are 'degrees' (or 'dd'), 'm', 'ft', 'km', 'mi', 'inches'. 
+		var unitsType = '<%= unitsType%>'; 
 
         var appName = "myApp";  
         var appDesc = "myAppDesc";

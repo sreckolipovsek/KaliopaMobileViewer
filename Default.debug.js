@@ -406,7 +406,7 @@ function mapInit() {
     //Tiled and untiled layers must adjust the OL INCHES_PER_UNIT values
     //for any degree-based projections.
 
-    var metersPerUnit = 1;
+    // var metersPerUnit = 1; //value returned from mapguide
     var inPerUnit = OpenLayers.INCHES_PER_UNIT.m * metersPerUnit;
     OpenLayers.INCHES_PER_UNIT["dd"] = inPerUnit;
     OpenLayers.INCHES_PER_UNIT["degrees"] = inPerUnit;
@@ -439,7 +439,7 @@ function mapInit() {
 			        //,
 			        //new OpenLayers.Control.OverviewMap()
 					     ],
-			        units: "m",
+			        units: unitsType,
 			        maxResolution: "auto",
 			        //minResolution: 0.5,
 			        maxExtent: extent,
@@ -469,7 +469,7 @@ function mapInit() {
                             new OpenLayers.Control.KeyboardDefaults()//,
 			        //new OpenLayers.Control.OverviewMap()
 					     ],
-			        units: "m",
+			        units: unitsType,
 			        maxResolution: "auto",
 			        //minResolution: 0.5,
 			        maxExtent: extent,
@@ -493,7 +493,7 @@ function mapInit() {
         useAsyncOverlay: true,
         buffer: 0,
         singleTile: true,
-        units: 'm',
+        units: unitsType,
         transitionEffect: 'resize',
         ratio: 1.1
     };
@@ -504,7 +504,7 @@ function mapInit() {
         useAsyncOverlay: true,
         buffer: 0,
         singleTile: true,
-        units: 'm',
+        units: unitsType,
         transitionEffect: 'resize',
         ratio: 1.1
     };
