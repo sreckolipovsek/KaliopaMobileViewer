@@ -74,9 +74,9 @@
     foreach (var fi in lyrs)
     {
         // legend image
-        // string url = "http://" + Request.ServerVariables["SERVER_NAME"] + "/mapguide/mapagent/mapagent.fcgi" + "?OPERATION=GETLEGENDIMAGE&SESSION=" + sessionId +
-        // "&VERSION=1.0.0&SCALE=" + map.ViewScale + "&LAYERDEFINITION=" + Server.UrlEncode(fi.GetLayerDefinition().ToString()) +
-        // "&THEMECATEGORY=" + (0) + "&TYPE=" + (-1) + "&CLIENTAGENT=" + "Ajax%20Viewer";
+        string url = "http://" + Request.ServerVariables["SERVER_NAME"] + "/mapguide/mapagent/mapagent.fcgi" + "?OPERATION=GETLEGENDIMAGE&SESSION=" + sessionId +
+        "&VERSION=1.0.0&SCALE=" + map.ViewScale + "&LAYERDEFINITION=" + Server.UrlEncode(fi.GetLayerDefinition().ToString()) +
+        "&THEMECATEGORY=" + (0) + "&TYPE=" + (-1) + "&CLIENTAGENT=" + "Mobile%20Ajax%20Viewer";
 
         string checkedIcon = "images/lc_checked.png";
         if (!fi.Visible)
@@ -84,11 +84,20 @@
             checkedIcon = "images/lc_unchecked.png";
         }
 
-        string oid = fi.GetObjectId();
-        Response.Write("\t<li><a href=\"#\" rel=\"" + oid + "\"><img id=\"Chk_" + oid + "\" onclick=\"ChangeVisibility(0,'" + oid + "');\" border=0 src=\"" + checkedIcon + "\" />" + /*"<img border=0 src=\"" + url + "\" />" +*/ fi.LegendLabel + "</a></li>\n");
+        MgByteReader layersData = resourceService.GetResourceContent(fi.GetLayerDefinition());
+
+        //is layer visible at current scale?
+        if (IsLayerVisibleAtScaleRange(layersData.ToString(), map.ViewScale))
+        {
+            string oid = fi.GetObjectId();
+            
+            //with legend image
+            Response.Write("\t<li><a href=\"#\" rel=\"" + oid + "\"><img id=\"Chk_" + oid + "\" onclick=\"ChangeVisibility(0,'" + oid + "');\" border=0 src=\"" + checkedIcon + "\" />" + "<img border=0 src=\"" + url + "\" />" + fi.LegendLabel + "</a></li>\n");
+            
+            //without legend image
+            //Response.Write("\t<li><a href=\"#\" rel=\"" + oid + "\"><img id=\"Chk_" + oid + "\" onclick=\"ChangeVisibility(0,'" + oid + "');\" border=0 src=\"" + checkedIcon + "\" />" + fi.LegendLabel + "</a></li>\n");
+        }
     }
-    
-	//System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(dir);
 	
     foreach (var di_child in grps)
     {
@@ -103,3 +112,56 @@
         
 	Response.Write("</ul>");
  %>
+
+<script runat="server">
+    bool IsLayerVisibleAtScaleRange(string layerData, double viewScale)
+    {
+        try
+        {
+            System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
+            doc.LoadXml(layerData);
+
+            System.Xml.XmlNodeList scaleRanges = doc.GetElementsByTagName("VectorScaleRange");
+            if(scaleRanges.Count == 0)
+            {
+                scaleRanges = doc.GetElementsByTagName("GridScaleRange");
+                if(scaleRanges.Count == 0) {
+                    scaleRanges = doc.GetElementsByTagName("DrawingLayerDefinition");
+                    if(scaleRanges.Count == 0)
+                        return true;
+                }
+            }
+
+            NumberFormatInfo nfi = System.Threading.Thread.CurrentThread.CurrentCulture.NumberFormat;
+            char decimalSeparator = nfi.NumberDecimalSeparator.ToCharArray()[0];
+            string CurrentDecimalSeparator = decimalSeparator.ToString();    
+        
+            String[] typeStyles = new String[]{"PointTypeStyle", "LineTypeStyle", "AreaTypeStyle", "CompositeTypeStyle"};
+            String[] ruleNames = new String[]{"PointRule", "LineRule", "AreaRule", "CompositeRule"};
+
+            for (int sc = 0; sc < scaleRanges.Count; sc++)
+            {
+                System.Xml.XmlElement scaleRange = (System.Xml.XmlElement)scaleRanges[sc];
+                System.Xml.XmlNodeList minElt = scaleRange.GetElementsByTagName("MinScale");
+                System.Xml.XmlNodeList maxElt = scaleRange.GetElementsByTagName("MaxScale");
+                String minScale, maxScale;
+                minScale = "0";
+                maxScale = "1000000000000.0";   // as MDF's VectorScaleRange::MAX_MAP_SCALE
+                if (minElt.Count > 0)
+                    minScale = minElt[0].ChildNodes[0].Value.Replace(",", CurrentDecimalSeparator).Replace(".", CurrentDecimalSeparator);
+                if (maxElt.Count > 0)
+                    maxScale = maxElt[0].ChildNodes[0].Value.Replace(",", CurrentDecimalSeparator).Replace(".", CurrentDecimalSeparator);
+
+                if (viewScale >= double.Parse(minScale) && viewScale < double.Parse(maxScale))
+                {
+                    return true;                
+                }
+            }
+            return false;
+        }
+        catch (Exception)
+        {
+            return true;
+        }
+    }
+</script>
