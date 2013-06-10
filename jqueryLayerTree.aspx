@@ -50,29 +50,35 @@
     if (Request.Form["dir"] == null || Request.Form["dir"].Length <= 0)
     {
         //root
-        grps = map.GetLayerGroups().Where(t => t.Group == null).ToList();
+        grps = map.GetLayerGroups().Where(t => t.Group == null && t.DisplayInLegend == true).ToList();
     }
     else
     {
         //child
         dir = Server.UrlDecode(Request.Form["dir"]).ToString().Replace("/", "");
-        grps = map.GetLayerGroups().Where(t => t.Group != null && t.Group.GetObjectId() == dir).ToList();
+        grps = map.GetLayerGroups().Where(t => t.Group != null && t.Group.GetObjectId() == dir && t.DisplayInLegend == true).ToList();
     }
 
     List<MgLayerBase> lyrs = null;
 
     if (string.IsNullOrEmpty(dir))
     {
-        lyrs = map.GetLayers().Where(t => t.Group == null).ToList(); //root layers
+        lyrs = map.GetLayers().Where(t => t.Group == null && t.DisplayInLegend == true).ToList(); //root layers
     }
     else
     {
-        lyrs = map.GetLayers().Where(t => t.Group.GetObjectId() == dir).ToList(); //layers inside groups ...
+        lyrs = map.GetLayers().Where(t => t.Group.GetObjectId() == dir && t.DisplayInLegend == true).ToList(); //layers inside groups ...
     }
     
     Response.Write("<ul class=\"jqueryFileTree\" style=\"display: none;\">\n");
     foreach (var fi in lyrs)
     {
+        //show only layers in Displayed Group
+        if (fi.Group != null && !fi.Group.DisplayInLegend)
+        {
+            continue;
+        }
+        
         // legend image
         string url = "http://" + Request.ServerVariables["SERVER_NAME"] + "/mapguide/mapagent/mapagent.fcgi" + "?OPERATION=GETLEGENDIMAGE&SESSION=" + sessionId +
         "&VERSION=1.0.0&SCALE=" + map.ViewScale + "&LAYERDEFINITION=" + Server.UrlEncode(fi.GetLayerDefinition().ToString()) +
@@ -88,7 +94,7 @@
 
         //is layer visible at current scale?
         if (IsLayerVisibleAtScaleRange(layersData.ToString(), map.ViewScale))
-        {
+        {          
             string oid = fi.GetObjectId();
             
             //with legend image
