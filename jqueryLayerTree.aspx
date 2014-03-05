@@ -67,7 +67,7 @@
     }
     else
     {
-        lyrs = map.GetLayers().Where(t => t.Group.GetObjectId() == dir && t.DisplayInLegend == true).ToList(); //layers inside groups ...
+        lyrs = map.GetLayers().Where(t => t.Group != null && t.Group.GetObjectId() == dir && t.DisplayInLegend == true).ToList(); //layers inside groups ...
     }
     
     Response.Write("<ul class=\"jqueryFileTree\" style=\"display: none;\">\n");
